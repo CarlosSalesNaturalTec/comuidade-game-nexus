@@ -1,0 +1,5 @@
+# Dependências do Nexus — GAME
+# Instale com:  pip install -r requirements.txt
+
+paho-mqtt==1.6.1   # cliente MQTT para Python
+# tkinter já vem instalado com o Python no Windows (sem pip necessário)
