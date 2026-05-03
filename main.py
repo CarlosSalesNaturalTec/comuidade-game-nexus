@@ -14,7 +14,7 @@ from painel import Painel
 def main():
     print("==============================================")
     print("   NEXUS — Estação de Controle     v1.0")
-    print("   Natural Tecnologia / GAME")
+    print("   Comunidade Game")
     print("==============================================")
     print()
 
