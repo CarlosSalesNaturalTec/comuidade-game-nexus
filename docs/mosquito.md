@@ -43,7 +43,7 @@ Na seção **Windows**, baixe o arquivo `.exe` mais recente (ex.: `mosquitto-2.x
 
 4. O caminho de instalação padrão é:
    ```
-   C:\Program Files\mosquitto\
+   C:\Program Files (x86)\mosquitto\
    ```
    Mantenha esse caminho — os comandos neste guia assumem ele.
 
@@ -74,7 +74,7 @@ Por padrão, o Mosquitto 2.x **recusa conexões de outros dispositivos** por seg
 
 O arquivo fica em:
 ```
-C:\Program Files\mosquitto\mosquitto.conf
+C:\Program Files (x86)\mosquitto\mosquitto.conf
 ```
 
 Para editá-lo é necessário permissão de administrador. Faça assim:
@@ -82,18 +82,15 @@ Para editá-lo é necessário permissão de administrador. Faça assim:
 1. Pressione **Win + S** e pesquise por `Notepad` (Bloco de Notas).
 2. Clique com o botão direito no resultado e escolha **"Executar como administrador"**.
 3. Dentro do Bloco de Notas: **Arquivo → Abrir**.
-4. Navegue até `C:\Program Files\mosquitto\` e abra `mosquitto.conf`.
+4. Navegue até `C:\Program Files (x86)\mosquitto\` e abra `mosquitto.conf`.
 
 ### 2.2 Adicionar as configurações do projeto GAME
 
 Role até o **final do arquivo** e adicione exatamente estas linhas:
 
 ```conf
-# ─── Configurações do Projeto GAME ───────────────────
-# Aceita conexões de qualquer dispositivo na rede local
-listener 1883
-
-# Permite conexão sem usuário e senha (rede isolada do evento)
+# Comunidade Game
+listener 1883 0.0.0.0
 allow_anonymous true
 ```
 
@@ -137,14 +134,24 @@ O serviço Mosquitto Broker foi iniciado com êxito.
 
 Antes de ligar qualquer NodeMCU, valide que o broker está funcionando corretamente usando as ferramentas de linha de comando que vieram com o instalador.
 
-Abra **dois** Prompts de Comando separados lado a lado.
+Abra **dois** terminais separados lado a lado.
+
+> ⚠️ **CMD vs PowerShell:** Os comandos abaixo têm sintaxe diferente dependendo do terminal.  
+> No **PowerShell** é obrigatório o `&` antes do caminho entre aspas.  
+> No **Prompt de Comando (cmd)** o `&` não é usado.
 
 ### Terminal 1 — Subscriber (ouvinte)
 
 Este terminal vai ficar escutando todas as mensagens do jogo:
 
+**PowerShell:**
+```powershell
+& "C:\Program Files (x86)\mosquitto\mosquitto_sub.exe" -h localhost -t "game/#" -v
+```
+
+**CMD:**
 ```cmd
-"C:\Program Files\mosquitto\mosquitto_sub.exe" -h localhost -t "game/#" -v
+"C:\Program Files (x86)\mosquitto\mosquitto_sub.exe" -h localhost -t "game/#" -v
 ```
 
 O cursor ficará parado aguardando mensagens. Isso é normal.
@@ -153,8 +160,14 @@ O cursor ficará parado aguardando mensagens. Isso é normal.
 
 Este terminal vai simular uma mensagem da Torre:
 
+**PowerShell:**
+```powershell
+& "C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m '{"hp": 24}'
+```
+
+**CMD:**
 ```cmd
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m "{\"hp\": 24}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m "{\"hp\": 24}"
 ```
 
 **Resultado esperado no Terminal 1:**
@@ -170,22 +183,22 @@ Execute cada linha no Terminal 2 em sequência para simular uma partida:
 
 ```cmd
 :: Nexus envia START
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/nexus/comando" -m "{\"cmd\": \"START\"}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/nexus/comando" -m "{\"cmd\": \"START\"}"
 
 :: Atacante reporta tiro
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/atacante/stamina" -m "{\"stamina\": 80, \"status\": \"ativo\"}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/atacante/stamina" -m "{\"stamina\": 80, \"status\": \"ativo\"}"
 
 :: Defensor absorve hit
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/defensor/hp" -m "{\"hp\": 4, \"status\": \"ativo\"}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/defensor/hp" -m "{\"hp\": 4, \"status\": \"ativo\"}"
 
 :: Torre recebe dano
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m "{\"hp\": 27}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m "{\"hp\": 27}"
 
 :: Defensor comete falta
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/defensor/punicao" -m "{\"tipo\": \"DANO_DUPLO\"}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/defensor/punicao" -m "{\"tipo\": \"DANO_DUPLO\"}"
 
 :: Torre recebe dano duplo
-"C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m "{\"hp\": 21}"
+"C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m "{\"hp\": 21}"
 ```
 
 Se o painel Python estiver aberto (`python main.py`), todas as barras de HP se atualizarão em tempo real enquanto você envia esses comandos.
@@ -213,7 +226,7 @@ Com isso, o Mosquitto estará rodando sempre que o notebook ligar — sem precis
 Verifique o log de erros do Mosquitto:
 
 ```cmd
-"C:\Program Files\mosquitto\mosquitto.exe" -c "C:\Program Files\mosquitto\mosquitto.conf" -v
+"C:\Program Files (x86)\mosquitto\mosquitto.exe" -c "C:\Program Files (x86)\mosquitto\mosquitto.conf" -v
 ```
 
 Esse comando roda o Mosquitto em modo verboso diretamente no terminal — qualquer erro de configuração aparecerá na tela.
@@ -265,7 +278,7 @@ sc query mosquitto           :: verifica o status
 ### Arquivo de configuração
 
 ```
-C:\Program Files\mosquitto\mosquitto.conf
+C:\Program Files (x86)\mosquitto\mosquitto.conf
 ```
 
 Conteúdo mínimo necessário para o projeto GAME (adicionar ao final):
@@ -277,6 +290,16 @@ allow_anonymous true
 
 ### Ferramentas de teste
 
+**PowerShell:**
+```powershell
+# Escutar todos os tópicos do jogo
+& "C:\Program Files (x86)\mosquitto\mosquitto_sub.exe" -h localhost -t "game/#" -v
+
+# Publicar mensagem manualmente
+& "C:\Program Files (x86)\mosquitto\mosquitto_pub.exe" -h localhost -t "game/torre/hp" -m '{"hp": 15}'
+```
+
+**CMD:**
 ```cmd
 :: Escutar todos os tópicos do jogo
 mosquitto_sub -h localhost -t "game/#" -v
@@ -285,7 +308,7 @@ mosquitto_sub -h localhost -t "game/#" -v
 mosquitto_pub -h localhost -t "game/torre/hp" -m "{\"hp\": 15}"
 ```
 
-> 💡 Se `mosquitto_sub` e `mosquitto_pub` não forem reconhecidos sem o caminho completo, adicione `C:\Program Files\mosquitto\` à variável de ambiente `PATH` do Windows.
+> 💡 Se `mosquitto_sub` e `mosquitto_pub` não forem reconhecidos sem o caminho completo, adicione `C:\Program Files (x86)\mosquitto\` à variável de ambiente `PATH` do Windows.
 
 ---
 
